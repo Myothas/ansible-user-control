@@ -2,26 +2,26 @@
 users_lists:
   - admin_user:
     users:
-    - username: username
-      fullname: "Full Name"
-      email: "george.bob@bigcorp.org"
-      shell: /bin/bash
-      ssh_key: "{{ lookup('file', 'username.pub') }}"
-      exclusive_ssh_key: yes
-      user_state: present
-      groups: admin
-      servers:
-        - masters
-        - bastion
-    - username: ansible
-      fullname: "Ansible"
-      email: "ansible@bigcorp.org"
-      shell: /bin/bash
-      ssh_key: "{{ lookup('file', 'ansible.pub') }}"
-      exclusive_ssh_key: yes
-      user_state: present
-      groups: admin
-      servers:
-        - masters
-        - workers
-        - bastion
+      - username: username
+        fullname: "Full Name"
+        email: "george.bob@bigcorp.org"
+        shell: /bin/bash
+        ssh_key: "{{ lookup('file', 'username.pub') }}"
+        exclusive_ssh_key: true
+        user_state: present
+        groups: admin
+        servers:
+          - masters
+          - bastion
+      - username: ansible
+        fullname: "Ansible"
+        email: "ansible@bigcorp.org"
+        shell: /bin/bash
+        ssh_key: "{{ lookup('file', 'ansible.pub') }}"
+        exclusive_ssh_key: true
+        user_state: present
+        groups: admin
+        servers:
+          - masters
+          - workers
+          - bastion

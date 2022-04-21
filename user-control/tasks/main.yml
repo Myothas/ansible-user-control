@@ -1,23 +1,23 @@
 ---
 - name: User | Include user-vars
-  include_vars:
+  ansible.builtin.include_vars:
     file: user-vars.yml
 
 - name: User | Put users from vars file in list
-  set_fact:
+  ansible.builtin.set_fact:
     user_list: "{{ (user_list | default([])) + [item.0.username] }}"
   with_subelements:
     - "{{ users_lists | map(attribute='users') | list | sum(start=[]) }}" # item 0
     - servers # item 1 is not used here, we only have this here so that we can use subelemet
 
 - name: User | Make sure 'admin' group exits
-  group:
+  ansible.builtin.group:
     name: admin
     state: present
   check_mode: false
 
 - name: User | Allow 'admin' group to gain root without password
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/sudoers
     state: present
     regexp: '^%admin'
@@ -26,11 +26,11 @@
   when: escalate_root_no_pass
 
 - name: User | Create all users
-  user:
+  ansible.builtin.user:
     name: "{{ item.0.username }}"
     groups: "{{ item.0.groups | default() }}"
     shell: "{{ item.0.shell | default('/bin/bash') }}"
-    createhome: yes
+    createhome: true
     comment: "{{ item.fullname | default('unknown') }}"
     state: "{{ item.0.user_state }}"
     remove: "{{ 'yes' if 'absent' in item.0.user_state else 'no' }}"
@@ -40,11 +40,16 @@
     - "{{ users_lists | map(attribute='users') | list | sum(start=[]) }}" # item 0
     - servers # item 1 is not used here, we only have this here so that we can use subelemet
   loop_control:
-    label: "username: {{ item.0.username }}, groups: {{ item.0.groups if item.0.groups is defined else ''}}, state: {{ item.0.user_state if item.0.user_state is defined else 'absent' }}, env: {{ item.0.env if item.0.env is defined else '' }}, servers: {{ item.1 if item.1 is defined else '' }}" # noqa 204
+    label: >-
+      username: {{ item.0.username }},
+      groups: {{ item.0.groups if item.0.groups is defined else ''}},
+      state: {{ item.0.user_state if item.0.user_state is defined else 'absent' }},
+      env: {{ item.0.env if item.0.env is defined else '' }},
+      servers: {{ item.1 if item.1 is defined else '' }}
   check_mode: false
 
 - name: User | Add authorized keys to users
-  authorized_key:
+  ansible.builtin.authorized_key:
     user: "{{ item.0.username }}"
     key: "{{ item.0.ssh_key }}"
     exclusive: "yes"
@@ -57,26 +62,30 @@
     - "{{ users_lists | map(attribute='users') | list | sum(start=[]) }}" # item 0
     - servers # item 1
   loop_control:
-    label: "username: {{ item.0.username }}, ssh_key: {{ 'True' if item.0.ssh_key is defined else 'False' }}, env: {{ item.0.env if item.0.env is defined else '' }}, servers: {{ item.1 if item.1 is defined else '' }}" # noqa 204
+    label: >-
+      username: {{ item.0.username }},
+      ssh_key: {{ 'True' if item.0.ssh_key is defined else 'False' }},
+      env: {{ item.0.env if item.0.env is defined else '' }},
+      servers: {{ item.1 if item.1 is defined else '' }}
 
 - name: User | Get list of existing users # noqa 301
-  shell: cat /etc/passwd | grep '/bin/bash' | cut -d ':' -f 1 | grep -v root | grep -v 'centos' | grep -v 'ubuntu' | grep -v 'op' # noqa 306 204
+  ansible.builtin.shell: cat /etc/passwd | grep '/bin/bash' | cut -d ':' -f 1 | grep -v root | grep -v 'centos' | grep -v 'ubuntu' | grep -v 'op' # noqa 306 204
   register: passwd_results
 
 - name: User | Delete user if user does not exist in vars file
-  user:
+  ansible.builtin.user:
     name: "{{ item }}"
     state: absent
-    remove: yes
+    remove: true
   when: "item not in user_list"
   with_items: "{{ passwd_results.stdout_lines | default([]) }}"
 
 - name: User | Get list of existing user directories # noqa 301
-  shell: ls /home | grep -v 'centos' | grep -v 'ubuntu' | grep -v 'op' # noqa 306 204
+  ansible.builtin.shell: ls /home | grep -v 'centos' | grep -v 'ubuntu' | grep -v 'op' # noqa 306 204
   register: home_dir_results
 
 - name: User | Delete user directory if user does not exist in vars file
-  file:
+  ansible.builtin.file:
     path: /home/{{ item }}
     state: absent
   when: "item not in user_list"
