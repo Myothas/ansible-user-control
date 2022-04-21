@@ -35,7 +35,7 @@
     state: "{{ item.0.user_state }}"
     remove: "{{ 'yes' if 'absent' in item.0.user_state else 'no' }}"
   when:
-    - item.1 in group_names
+    - item.1 in group_names or item.1 in 'all'
   with_subelements:
     - "{{ users_lists | map(attribute='users') | list | sum(start=[]) }}" # item 0
     - servers # item 1 is not used here, we only have this here so that we can use subelemet
