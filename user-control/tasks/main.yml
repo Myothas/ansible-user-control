@@ -55,7 +55,7 @@
     exclusive: "yes"
     state: present
   when:
-    - item.1 in group_names
+    - item.1 in group_names or item.1 in 'all'
     - item.0.ssh_key is defined
     - "'absent' not in item.0.user_state"
   with_subelements:
