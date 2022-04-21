@@ -70,6 +70,7 @@
 
 - name: User | Get list of existing users # noqa 301
   ansible.builtin.shell: cat /etc/passwd | grep '/bin/bash' | cut -d ':' -f 1 | grep -v root | grep -v 'centos' | grep -v 'ubuntu' | grep -v 'op' # noqa 306 204
+  ignore_errors: true # Incase of empty response
   register: passwd_results
 
 - name: User | Delete user if user does not exist in vars file
@@ -82,6 +83,7 @@
 
 - name: User | Get list of existing user directories # noqa 301
   ansible.builtin.shell: ls /home | grep -v 'centos' | grep -v 'ubuntu' | grep -v 'op' # noqa 306 204
+  ignore_errors: true # Incase of empty response
   register: home_dir_results
 
 - name: User | Delete user directory if user does not exist in vars file
