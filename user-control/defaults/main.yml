@@ -1,0 +1,3 @@
+---
+# Allow escalating to root without password.
+escalate_root_no_pass: true
