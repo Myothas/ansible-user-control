@@ -1,1 +1,24 @@
-test: false
+controller:
+  # -- Value of label `app.kubernetes.io/component`
+  component: rollouts-controller
+  # -- Annotations to be added to the controller deployment
+  deploymentAnnotations: {}
+  # -- Labels to be added to the controller deployment
+  deploymentLabels: {}
+  # -- Annotations to be added to application controller pods
+  podAnnotations: {}
+  # -- Labels to be added to the application controller pods
+  podLabels: {}
+  # -- [Node selector]
+  nodeSelector: {}
+  # -- [Tolerations] for use with node taints
+  tolerations: []
+  # -- Assign custom [affinity] rules to the deployment
+  affinity: {}
+  logging:
+    # -- Set the logging level (one of: `debug`, `info`, `warn`, `error`)
+    level: info
+    # -- Set the klog logging level
+    kloglevel: "0"
+    # -- Set the logging format (one of: `text`, `json`)
+    format: "json"
